@@ -1,29 +1,7 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice } from '@reduxjs/toolkit';
+import { fetchProducts } from '../api/products';
+import { initialState, Product } from './types';
 
-export interface Product {
-    id: number;
-    title: string;
-    price: number;
-    imageUrl: string;
-}
-interface Productstate {
-    products: Product[];
-    liked: Product[];
-    loading: boolean;
-    error: string | null;
-}
-const initialState: Productstate = {
-    products: [],
-    liked: [],
-    loading: false,
-    error: null,
-};
-
-export const fetchProducts = createAsyncThunk('products/fetchProducts', async () => {
-    const response = await axios.get('https://662b75c2de35f91de1585780.mockapi.io/items');
-    return response.data as Product[];
-});
 const Productslice = createSlice({
     name: 'products',
     initialState,

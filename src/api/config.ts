@@ -1,0 +1,3 @@
+export const BASE_URL =
+  process.env.EXPO_PUBLIC_BASE_URL ||
+  'https://662b75c2de35f91de1585780.mockapi.io';
