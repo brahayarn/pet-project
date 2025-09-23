@@ -9,6 +9,7 @@ export default function CustomImage(uri: { uri: string }) {
             <Image
                 style={styles.image}
                 source={uri}
+                contentFit="cover"
             />
         </View>
     );
