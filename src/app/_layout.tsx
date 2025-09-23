@@ -43,7 +43,7 @@ export default function RootLayout() {
         <PersistGate loading={null} persistor={persistor}>
           <Stack.Navigator>
             <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
-            <Stack.Screen name="DetailScreen" component={DetailScreen} />
+            <Stack.Screen name="DetailScreen" component={DetailScreen} options={({ route }) => ({ title: route.params.item.title })} />
           </Stack.Navigator>
         </PersistGate>
       </SafeAreaProvider>
