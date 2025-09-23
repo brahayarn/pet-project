@@ -2,20 +2,21 @@ import { fetchProducts } from "@/src/api/products";
 import ProductCard from "@/src/components/card/ProductCard";
 import Container from "@/src/components/ui/Container";
 import { toggleLiked } from "@/src/redux/slice";
-import { AppDispatch, RootState } from "@/src/redux/store";
+import { RootState } from "@/src/redux/store";
 import { FlashList } from "@shopify/flash-list";
 import React, { useEffect } from 'react';
 import { Text } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from "../redux/hooks/hooks";
 import { styles } from "./styles";
 
 
 export default function LikedScreen() {
-    const dispatch = useDispatch<AppDispatch>();
+    const dispatch = useAppDispatch();
     const {liked, loading, error } = useSelector((state: RootState) => state.products);
 
     useEffect(() => {
-        dispatch(fetchProducts());
+        dispatch(fetchProducts(""));
     }, [dispatch]);
 
     if (loading) return <Text>Loading...</Text>;
