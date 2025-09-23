@@ -5,9 +5,9 @@ import { BASE_URL } from "./config";
 
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
-  async (search: string = "", { rejectWithValue }) => {
+  async ({ search = "", page = 1}: { search?: string; page?: number; }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}/items`, {
+      const response = await axios.get(`${BASE_URL}/items?page=${page}&limit=10`, {
         params: search ? { title: search.toLowerCase() } : {},
       });
       return response.data as Product[];

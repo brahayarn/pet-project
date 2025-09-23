@@ -4,54 +4,91 @@ import Container from "@/src/components/ui/Container";
 import { toggleLiked } from "@/src/redux/slice";
 import { RootState } from "@/src/redux/store";
 import { FlashList } from "@shopify/flash-list";
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Text } from 'react-native';
 import { useSelector } from "react-redux";
+import { FooterIndicator } from "../components/card/FooterIndicator";
 import Empty from "../components/empty/Empy";
 import Search from "../components/search/Search";
 import useDebounce from "../hooks/useDebounce";
 import { useAppDispatch } from "../redux/hooks/hooks";
+import { Product } from "../redux/types";
 import { styles } from "./styles";
 
 export default function HomeScreen() {
     const dispatch = useAppDispatch();
-    const { products, liked, loading, error } = useSelector((state: RootState) => state.products);
-    const [search, setSearch] = useState('')
+    const { liked, loading, error } = useSelector((state: RootState) => state.products);
+    const [search, setSearch] = useState('');
+    
+    const [data, setData] = useState<Product[]>([]);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [localLoading, setLocalLoading] = useState(false);
 
-    const debouncedSearch = useDebounce({ value: search, delay: 1000 })
+    const debouncedSearch = useDebounce({ value: search, delay: 500 });
 
     useEffect(() => {
         const fetchData = async () => {
+            setLocalLoading(true);
             try {
-                await dispatch(fetchProducts(String(debouncedSearch))).unwrap();
+                const products = await dispatch(
+                    fetchProducts({ search: typeof debouncedSearch === 'string' ? debouncedSearch : '', page: 1 })
+                ).unwrap();
+                setData(products);
+                setPage(2);
+                setHasMore(products.length === 10);
             } catch (err) {
-                console.warn("Search error:", err);
+                setData([]);
+                setHasMore(false);
             }
+            setLocalLoading(false);
         };
         fetchData();
     }, [debouncedSearch, dispatch]);
 
-    if (loading) return <Text>Loading...</Text>;
-    if (error) return (
-        <Empty search={search} setSearch={setSearch} />
-    );
+    const loadMoreData = useCallback(async () => {
+        if (localLoading || !hasMore) return;
+        setLocalLoading(true);
+        try {
+            const products = await dispatch(
+                fetchProducts({ search: typeof debouncedSearch === 'string' ? debouncedSearch : '', page })
+            ).unwrap();
+            if (products.length > 0) {
+                setData((prev) => [...prev, ...products]);
+                setPage((prev) => prev + 1);
+                setHasMore(products.length === 10);
+            } else {
+                setHasMore(false);
+            }
+        } catch (err) {
+            setHasMore(false);
+        }
+        setLocalLoading(false);
+    }, [debouncedSearch, page, hasMore, localLoading, dispatch]);
+
+    if (loading && page === 1) return <Text>Loading...</Text>;
+    if (error) return <Empty search={search} setSearch={setSearch} />;
+    if (!data.length && !localLoading) return <Empty search={search} setSearch={setSearch} />;
 
     return (
         <Container>
             <Search search={search} setSearch={setSearch} />
-                <FlashList
-                    data={products}
-                    style={styles.cardContainer}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item }) => (
-                        <ProductCard
-                            item={item}
-                            liked={liked}
-                            dispatch={dispatch}
-                            toggleLiked={toggleLiked}
-                        />
-                    )}
-                />
+            <FlashList
+                data={data}
+                style={styles.cardContainer}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                    <ProductCard
+                        item={item}
+                        liked={liked}
+                        dispatch={dispatch}
+                        toggleLiked={toggleLiked}
+                    />
+                )}
+                onEndReached={loadMoreData}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={FooterIndicator}
+            />
         </Container>
     );
 }

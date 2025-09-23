@@ -16,7 +16,7 @@ export default function LikedScreen() {
     const {liked, loading, error } = useSelector((state: RootState) => state.products);
 
     useEffect(() => {
-        dispatch(fetchProducts(""));
+        dispatch(fetchProducts({ search: "" }));
     }, [dispatch]);
 
     if (loading) return <Text>Loading...</Text>;

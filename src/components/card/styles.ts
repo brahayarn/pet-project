@@ -10,4 +10,9 @@ export const styles = StyleSheet.create({
         fontSize: ms(16),
         color: 'black'
     },
+    footer: {
+        paddingVertical: ms(20),
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
 });
