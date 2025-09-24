@@ -1,10 +1,10 @@
+import { RootStackParamList } from "@/App";
 import { toggleLiked } from "@/src/redux/slice";
 import { StackScreenProps } from '@react-navigation/stack';
 import { Image } from 'expo-image';
 import { StyleSheet, Text, View } from 'react-native';
 import { ms } from 'react-native-size-matters';
 import { useSelector } from 'react-redux';
-import { RootStackParamList } from '../app/_layout';
 import Button from '../components/ui/button/Button';
 import { useAppDispatch } from '../redux/hooks/hooks';
 import { RootState } from '../redux/store';
