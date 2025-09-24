@@ -5,7 +5,7 @@ import { toggleLiked } from "@/src/redux/slice";
 import { RootState } from "@/src/redux/store";
 import { FlashList } from "@shopify/flash-list";
 import React, { useCallback, useEffect, useState } from 'react';
-import { Text } from 'react-native';
+import { RefreshControl } from 'react-native';
 import { useSelector } from "react-redux";
 import { FooterIndicator } from "../components/card/FooterIndicator";
 import Empty from "../components/empty/Empy";
@@ -19,35 +19,44 @@ export default function HomeScreen() {
     const dispatch = useAppDispatch();
     const { liked, loading, error } = useSelector((state: RootState) => state.products);
     const [search, setSearch] = useState('');
-    
+
     const [data, setData] = useState<Product[]>([]);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [localLoading, setLocalLoading] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
 
     const debouncedSearch = useDebounce({ value: search, delay: 500 });
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setLocalLoading(true);
-            try {
-                const products = await dispatch(
-                    fetchProducts({ search: typeof debouncedSearch === 'string' ? debouncedSearch : '', page: 1 })
-                ).unwrap();
-                setData(products);
-                setPage(2);
-                setHasMore(products.length === 10);
-            } catch (err) {
-                setData([]);
-                setHasMore(false);
-            }
-            setLocalLoading(false);
-        };
-        fetchData();
+    const fetchInitialData = useCallback(async () => {
+        setLocalLoading(true);
+        try {
+            await new Promise(res => setTimeout(res, 1000));
+            const products = await dispatch(
+                fetchProducts({ search: typeof debouncedSearch === 'string' ? debouncedSearch : '', page: 1 })
+            ).unwrap();
+            setData(products);
+            setPage(2);
+            setHasMore(products.length === 10);
+        } catch (err) {
+            setData([]);
+            setHasMore(false);
+        }
+        setLocalLoading(false);
     }, [debouncedSearch, dispatch]);
 
+    useEffect(() => {
+        fetchInitialData();
+    }, [debouncedSearch]);
+
+    const onRefresh = useCallback(async () => {
+        setPage(1);
+        await fetchInitialData();
+        setRefreshing(false);
+    }, [fetchInitialData]);
+
     const loadMoreData = useCallback(async () => {
-        if (localLoading || !hasMore) return;
+        if (localLoading || !hasMore || refreshing) return;
         setLocalLoading(true);
         try {
             const products = await dispatch(
@@ -64,9 +73,8 @@ export default function HomeScreen() {
             setHasMore(false);
         }
         setLocalLoading(false);
-    }, [debouncedSearch, page, hasMore, localLoading, dispatch]);
+    }, [debouncedSearch, page, hasMore, localLoading, dispatch, refreshing]);
 
-    if (loading && page === 1) return <Text>Loading...</Text>;
     if (error) return <Empty search={search} setSearch={setSearch} />;
     if (!data.length && !localLoading) return <Empty search={search} setSearch={setSearch} />;
 
@@ -88,6 +96,12 @@ export default function HomeScreen() {
                 onEndReached={loadMoreData}
                 onEndReachedThreshold={0.5}
                 ListFooterComponent={FooterIndicator}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />
+                }
             />
         </Container>
     );
