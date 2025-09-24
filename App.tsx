@@ -1,15 +1,16 @@
-import { persistor, store } from "@/src/redux/store";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from "react";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider } from "react-redux";
 import { PersistGate } from 'redux-persist/integration/react';
-import { Product } from "../redux/types";
-import DetailScreen from "../screens/DetailScreen";
-import HomeScreen from "../screens/HomeScreen";
-import LikedScreen from "../screens/LikedScreen";
+import { Product } from "./src/redux/types";
+import HomeScreen from "./src/screens/HomeScreen";
+import LikedScreen from "./src/screens/LikedScreen";
+import { persistor, store } from "./src/redux/store";
+import DetailScreen from "./src/screens/DetailScreen";
 
 const Tab = createBottomTabNavigator();
 export type RootStackParamList = {
@@ -41,10 +42,12 @@ export default function RootLayout() {
     <Provider store={store}>
       <SafeAreaProvider>
         <PersistGate loading={null} persistor={persistor}>
-          <Stack.Navigator>
-            <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
-            <Stack.Screen name="DetailScreen" component={DetailScreen} options={({ route }) => ({ title: route.params.item.title })} />
-          </Stack.Navigator>
+          <NavigationContainer>
+            <Stack.Navigator>
+              <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
+              <Stack.Screen name="DetailScreen" component={DetailScreen} options={({ route }) => ({ title: route.params.item.title })} />
+            </Stack.Navigator>
+          </NavigationContainer>
         </PersistGate>
       </SafeAreaProvider>
     </Provider>
