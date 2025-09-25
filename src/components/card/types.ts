@@ -1,8 +1,10 @@
+import { AppDispatch } from "@/src/redux/store";
 import { Product } from "@/src/redux/types";
+import { AnyAction } from "@reduxjs/toolkit";
 
 export type Props = {
     item: Product;
     liked: Product[];
-    dispatch: (action: any) => void;
-    toggleLiked: (item: any) => any;
+    dispatch: AppDispatch;
+    toggleLiked: (id: Product['id']) => AnyAction;
 };

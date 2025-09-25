@@ -1,7 +1,13 @@
 import { ReactNode } from 'react';
 import { Text } from 'react-native';
 
-export const Custom = ({children, styles}: {children: ReactNode, styles: any}) => {
+type CustomTextProps = {
+  children: ReactNode;
+  styles: {
+    text: object;
+  };
+};
+export const Custom = ({children, styles}: CustomTextProps) => {
   return (
     <Text style={styles.text}>
       {children}

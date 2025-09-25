@@ -6,18 +6,17 @@ import { RootState } from "@/src/redux/store";
 import { FlashList } from "@shopify/flash-list";
 import React, { useCallback, useEffect, useState } from 'react';
 import { RefreshControl } from 'react-native';
-import { useSelector } from "react-redux";
 import { FooterIndicator } from "../components/card/FooterIndicator";
 import Empty from "../components/empty/Empy";
 import Search from "../components/search/Search";
 import useDebounce from "../hooks/useDebounce";
-import { useAppDispatch } from "../redux/hooks/hooks";
+import { useAppDispatch, useAppSelector } from "../redux/hooks/hooks";
 import { Product } from "../redux/types";
 import { styles } from "./styles";
 
 export default function HomeScreen() {
     const dispatch = useAppDispatch();
-    const { liked, loading, error } = useSelector((state: RootState) => state.products);
+    const { liked, error } = useAppSelector((state: RootState) => state.products);
     const [search, setSearch] = useState('');
 
     const [data, setData] = useState<Product[]>([]);
