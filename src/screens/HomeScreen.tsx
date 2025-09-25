@@ -34,9 +34,9 @@ export default function HomeScreen() {
             const products = await dispatch(
                 fetchProducts({ search: typeof debouncedSearch === 'string' ? debouncedSearch : '', page: 1 })
             ).unwrap();
-            setData(products);
+            setData(products ?? []);
             setPage(2);
-            setHasMore(products.length === 10);
+            setHasMore(Array.isArray(products) && products.length === 10);
         } catch (err) {
             setData([]);
             setHasMore(false);
@@ -61,8 +61,8 @@ export default function HomeScreen() {
             const products = await dispatch(
                 fetchProducts({ search: typeof debouncedSearch === 'string' ? debouncedSearch : '', page })
             ).unwrap();
-            if (products.length > 0) {
-                setData((prev) => [...prev, ...products]);
+            if (products && products.length > 0) {
+                setData((prev) => [...prev, ...(products ?? [])]);
                 setPage((prev) => prev + 1);
                 setHasMore(products.length === 10);
             } else {
