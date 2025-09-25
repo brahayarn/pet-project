@@ -6,14 +6,13 @@ import { RootState } from "@/src/redux/store";
 import { FlashList } from "@shopify/flash-list";
 import React, { useEffect } from 'react';
 import { Text } from 'react-native';
-import { useSelector } from 'react-redux';
-import { useAppDispatch } from "../redux/hooks/hooks";
+import { useAppDispatch, useAppSelector } from "../redux/hooks/hooks";
 import { styles } from "./styles";
 
 
 export default function LikedScreen() {
     const dispatch = useAppDispatch();
-    const {liked, loading, error } = useSelector((state: RootState) => state.products);
+    const { liked, loading, error } = useAppSelector((state: RootState) => state.products);
 
     useEffect(() => {
         dispatch(fetchProducts({ search: "" }));

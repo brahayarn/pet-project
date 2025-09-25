@@ -3,14 +3,16 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from "react";
+import { StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ms } from "react-native-size-matters";
 import { Provider } from "react-redux";
 import { PersistGate } from 'redux-persist/integration/react';
+import { persistor, store } from "./src/redux/store";
 import { Product } from "./src/redux/types";
+import DetailScreen from "./src/screens/DetailScreen";
 import HomeScreen from "./src/screens/HomeScreen";
 import LikedScreen from "./src/screens/LikedScreen";
-import { persistor, store } from "./src/redux/store";
-import DetailScreen from "./src/screens/DetailScreen";
 
 const Tab = createBottomTabNavigator();
 export type RootStackParamList = {
@@ -45,7 +47,23 @@ export default function RootLayout() {
           <NavigationContainer>
             <Stack.Navigator>
               <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
-              <Stack.Screen name="DetailScreen" component={DetailScreen} options={({ route }) => ({ title: route.params.item.title })} />
+              <Stack.Screen
+                name="DetailScreen"
+                component={DetailScreen}
+                options={({ route, navigation }) => ({
+                  title: route.params.item.title,
+                  presentation: 'modal',
+                  headerLeft: () => (
+                    <Ionicons
+                      name="close"
+                      size={24}
+                      color="black"
+                      onPress={() => navigation.goBack()}
+                      style={styles.icon}
+                    />
+                  ),
+                })}
+              />
             </Stack.Navigator>
           </NavigationContainer>
         </PersistGate>
@@ -53,3 +71,9 @@ export default function RootLayout() {
     </Provider>
   );
 }
+
+export const styles = StyleSheet.create({
+    icon: {
+      marginLeft: ms(15),
+    },
+});

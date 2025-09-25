@@ -4,17 +4,16 @@ import { StackScreenProps } from '@react-navigation/stack';
 import { Image } from 'expo-image';
 import { StyleSheet, Text, View } from 'react-native';
 import { ms } from 'react-native-size-matters';
-import { useSelector } from 'react-redux';
 import Button from '../components/ui/button/Button';
-import { useAppDispatch } from '../redux/hooks/hooks';
+import { useAppDispatch, useAppSelector } from '../redux/hooks/hooks';
 import { RootState } from '../redux/store';
 
 type Props = StackScreenProps<RootStackParamList, 'DetailScreen'>;
 
 export const DetailScreen = ({ route }: Props) => {
     const { item } = route.params;
-     const dispatch = useAppDispatch();
-         const { liked} = useSelector((state: RootState) => state.products);
+    const dispatch = useAppDispatch();
+    const { liked } = useAppSelector((state: RootState) => state.products);
 
     return (
         <View style={styles.container}>
