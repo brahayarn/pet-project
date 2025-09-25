@@ -38,6 +38,7 @@ export default function HomeScreen() {
             setPage(2);
             setHasMore(Array.isArray(products) && products.length === 10);
         } catch (err) {
+            console.error('Error fetching products:', err);
             setData([]);
             setHasMore(false);
         }
@@ -46,7 +47,7 @@ export default function HomeScreen() {
 
     useEffect(() => {
         fetchInitialData();
-    }, [debouncedSearch]);
+    }, [fetchInitialData]); 
 
     const onRefresh = useCallback(async () => {
         setPage(1);
@@ -69,6 +70,7 @@ export default function HomeScreen() {
                 setHasMore(false);
             }
         } catch (err) {
+            console.error('Error fetching more products:', err);
             setHasMore(false);
         }
         setLocalLoading(false);
